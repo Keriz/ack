@@ -5,6 +5,10 @@ LIBS += $(SDL2LIB)
 SDL2=SDL2/x86_64-w64-mingw32/include
 EXE = game.exe
 
-all: 
-	$(CC) -I$(SDL2) $(LIBS) $(OBJS) -o $(EXE)
-	./game.exe
+all: dll
+	zig cc -MD -MFgame.o -g -I$(SDL2) $(LIBS) src/sdl_ack.cc -o $(EXE) 
+
+dll:
+	zig cc -MD -MFgamedll.o -dynamic src/ack.cc -o game.dll
+
+#	./game.exe
