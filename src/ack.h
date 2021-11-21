@@ -56,8 +56,6 @@ struct game_input {
 	uint32 key_state[512];
 };
 
-game_input input = {};
-
 struct game_memory {
 	bool32 IsInitialized;
 	uint64 PermanentStorageSize;
