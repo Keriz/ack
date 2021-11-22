@@ -29,7 +29,7 @@ LoadGameCode(void) {
 	game_code Result;
 
 #if ACK_DEBUG
-	CopyFileW((LPCWSTR) "game.dll", (LPCWSTR) "game_tmp.dll", FALSE);
+	CopyFileA((LPCSTR) "game.dll", (LPCSTR) "game_tmp.dll", FALSE);
 #endif
 
 	Result.GameCodeDLL = SDL_LoadObject("game_tmp.dll");
@@ -125,7 +125,6 @@ int main(int argc, char *args[]) {
 					//TODO(gthi): change to SDLK_Keys
 					input.key[event.key.keysym.scancode]       = SDL_KEYDOWN;
 					input.key_state[event.key.keysym.scancode] = event.key.state;
-					gameRunning                                = 0;
 				} else if (event.type == SDL_KEYUP) {
 					input.key[event.key.keysym.scancode]       = SDL_KEYUP;
 					input.key_state[event.key.keysym.scancode] = event.key.state;
@@ -163,7 +162,7 @@ int main(int argc, char *args[]) {
 				//TODO(gthi): log the missed frame
 			}
 
-			//Game.UpdateAndRender(&memory, &input, &buffer, &state);
+			Game.UpdateAndRender(&memory, &input, &buffer, &state);
 
 			SDL_RenderClear(renderer);
 			SDL_SetRenderDrawColor(renderer, buffer.color, buffer.color, buffer.color, SDL_ALPHA_OPAQUE);
