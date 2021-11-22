@@ -9,10 +9,8 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/game.exe",
-            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
             "console": "integratedTerminal",
         }
     ]
