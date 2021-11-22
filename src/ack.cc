@@ -20,7 +20,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender) {
 
 //TODO(gthi):PORTABLE CODE!
 
-#if WIN32
+#ifdef WIN32
 #include "windows.h"
 
 int CALLBACK

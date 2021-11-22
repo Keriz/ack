@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#define WIN32 1
+#define ACK_DEBUG 1
 
 const int SCREEN_WIDTH  = 640;
 const int SCREEN_HEIGHT = 480;

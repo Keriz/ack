@@ -1,9 +1,9 @@
 
 #include "ack.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <stdio.h>
 
-#if WIN32
+#if ACK_DEBUG
 #include "windows.h"
 #endif
 
@@ -28,9 +28,9 @@ internal game_code
 LoadGameCode(void) {
 	game_code Result;
 
-	/* #if WIN32
+#if ACK_DEBUG
 	CopyFileW((LPCWSTR) "game.dll", (LPCWSTR) "game_tmp.dll", FALSE);
-#endif */
+#endif
 
 	Result.GameCodeDLL = SDL_LoadObject("game_tmp.dll");
 	if (Result.GameCodeDLL) {
@@ -166,7 +166,7 @@ int main(int argc, char *args[]) {
 			//Game.UpdateAndRender(&memory, &input, &buffer, &state);
 
 			SDL_RenderClear(renderer);
-			SDL_SetRenderDrawColor(renderer, buffer.color, buffer.color, 0x2, SDL_ALPHA_OPAQUE);
+			SDL_SetRenderDrawColor(renderer, buffer.color, buffer.color, buffer.color, SDL_ALPHA_OPAQUE);
 			SDL_RenderDrawLine(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x0, SDL_ALPHA_OPAQUE);
 
