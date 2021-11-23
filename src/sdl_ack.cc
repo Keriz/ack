@@ -10,6 +10,8 @@
 struct game_code {
 	void *GameCodeDLL;
 	game_update_and_render *UpdateAndRender;
+	FILETIME LastWriteTime;
+
 	bool32 IsValid;
 };
 
@@ -24,21 +26,50 @@ UnloadGameCode(game_code *GameCode) {
 	GameCode->UpdateAndRender = GameUpdateAndRenderStub;
 }
 
+inline FILETIME
+Win32GetLastWriteTime(char *Filename) {
+
+	WIN32_FIND_DATAA FileData;
+	FILETIME FileTime = {};
+
+	HANDLE File = FindFirstFileA(Filename, &FileData);
+
+	if (File != INVALID_HANDLE_VALUE) {
+		FileTime = FileData.ftLastWriteTime;
+	} else {
+		//TODO:handle properly
+	}
+	return FileTime;
+}
+
 internal game_code
 LoadGameCode(void) {
 	game_code Result;
 
+	char *SourceDLLName = "game.dll";
+	char *TempDLLName   = "game_temp.dll";
+
 #if ACK_DEBUG
-	CopyFileA((LPCSTR) "game.dll", (LPCSTR) "game_tmp.dll", FALSE);
+
+	CopyFileA((LPCSTR)SourceDLLName, (LPCSTR)TempDLLName, FALSE);
+
 #endif
 
-	Result.GameCodeDLL = SDL_LoadObject("game_tmp.dll");
+	Result.GameCodeDLL = SDL_LoadObject(TempDLLName);
 	if (Result.GameCodeDLL) {
 		Result.UpdateAndRender = (game_update_and_render *)SDL_LoadFunction(Result.GameCodeDLL, "GameUpdateAndRender");
 		Result.IsValid         = (Result.UpdateAndRender && 1);
+
+		LPBY_HANDLE_FILE_INFORMATION FileInfo = nullptr;
+		if (GetFileInformationByHandle(Result.GameCodeDLL, FileInfo)) {
+			Result.LastWriteTime = FileInfo->ftLastWriteTime;
+		} else {
+			//TODO:handle error
+		}
 	}
 	if (!Result.IsValid) {
 		Result.UpdateAndRender = GameUpdateAndRenderStub;
+		Result.LastWriteTime   = (FILETIME){};
 	}
 	return Result;
 }
@@ -101,14 +132,16 @@ int main(int argc, char *args[]) {
 
 		game_code Game       = {};
 		Game.UpdateAndRender = GameUpdateAndRenderStub;
+		Game.LastWriteTime   = (FILETIME){};
 
 		Game = LoadGameCode();
 
 		while (gameRunning) {
-			if (LoadCounter++ > 120) {
+			FILETIME LastWriteTime = Win32GetLastWriteTime("game.dll");
+			if (CompareFileTime(&LastWriteTime, &Game.LastWriteTime) > 0) {
 				UnloadGameCode(&Game);
-				Game        = LoadGameCode();
-				LoadCounter = 0;
+				Game               = LoadGameCode();
+				Game.LastWriteTime = LastWriteTime;
 			}
 			//TODO(gthi): handle input
 			SDL_Event event;
